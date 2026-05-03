@@ -122,6 +122,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             title: switch (widget.source) {
               LobbySource(:final seek) => _LobbyGameTitle(seek: seek),
               _ => const SizedBox.shrink(),
@@ -133,6 +134,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             title: _ChallengeGameTitle(
               challenge: (widget.source as UserChallengeSource).challengeRequest,
             ),
@@ -147,6 +149,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             title: _ChallengeGameTitle(
               challenge: (widget.source as UserChallengeSource).challengeRequest,
             ),
@@ -208,6 +211,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             leading: isRealTimePlayingGame ? SocketPingRatingIcon(socketUri: socketUri) : null,
             title: _StandaloneGameTitle(id: createdGameId, lastMoveAt: widget.lastMoveAt),
             actions: [
@@ -228,6 +232,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             leading: const SocketPingRatingIcon(),
             title: _ChallengeGameTitle(
               challenge: (widget.source as UserChallengeSource).challengeRequest,
@@ -253,6 +258,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             leading: const SocketPingRatingIcon(),
             title: switch (widget.source) {
               LobbySource(:final seek) => _LobbyGameTitle(seek: seek),
@@ -283,6 +289,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            centerTitle: true,
             leading: const SocketPingRatingIcon(),
             title: switch (widget.source) {
               LobbySource(:final seek) => _LobbyGameTitle(seek: seek),
