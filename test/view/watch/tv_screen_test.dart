@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lichess_mobile/src/model/common/id.dart';
 import 'package:lichess_mobile/src/model/tv/tv_channel.dart';
+import 'package:lichess_mobile/src/view/game/watcher_list_bottom_sheet.dart';
 import 'package:lichess_mobile/src/view/watch/tv_screen.dart';
 
 import '../../model/game/game_socket_example_data.dart';
@@ -93,6 +94,34 @@ void main() {
       expect(boardHasPiece(tester, Square.e2, Piece.whitePawn), isTrue);
       expect(getBoardPieces(tester).containsKey(Square.e4), isFalse);
       expect(tester.widget<Chessboard>(find.byType(Chessboard)).interactive, isFalse);
+    });
+
+    testWidgets('opens the spectator list when the watcher badge is tapped', (tester) async {
+      final app = await makeTestProviderScopeApp(
+        tester,
+        home: const TvScreen(channel: TvChannel.best, initialGame: (gameId, Side.white)),
+      );
+      await tester.pumpWidget(app);
+      await loadGame(tester);
+
+      // Server sends a crowd update with a couple of named watchers.
+      sendServerSocketMessages(tvSocketUri, [
+        '{"t": "crowd", "v": 1, "d": {"watchers": {"nb": 3, "users": ["alice", "bob"], "anons": 1}}}',
+      ]);
+      await tester.pump();
+
+      // The watcher badge should be visible and show the count.
+      expect(find.text('3'), findsOneWidget);
+
+      // Tapping the badge opens the spectator bottom sheet with names.
+      await tester.tap(find.text('3'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(WatcherListBottomSheet), findsOneWidget);
+      expect(find.text('Spectators (3)'), findsOneWidget);
+      expect(find.text('alice'), findsOneWidget);
+      expect(find.text('bob'), findsOneWidget);
+      expect(find.text('1 anonymous'), findsOneWidget);
     });
   });
 }

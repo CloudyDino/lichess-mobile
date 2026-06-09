@@ -16,6 +16,7 @@ import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:lichess_mobile/src/utils/navigation.dart';
 import 'package:lichess_mobile/src/view/game/game_loading_board.dart';
 import 'package:lichess_mobile/src/view/game/game_player.dart';
+import 'package:lichess_mobile/src/view/game/watcher_list_bottom_sheet.dart';
 import 'package:lichess_mobile/src/view/settings/toggle_sound_button.dart';
 import 'package:lichess_mobile/src/widgets/bottom_bar.dart';
 import 'package:lichess_mobile/src/widgets/buttons.dart';
@@ -291,11 +292,23 @@ class _WatcherButton extends ConsumerWidget {
     if (nb <= 0) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Badge(
-        label: Text('$nb'),
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        textColor: Theme.of(context).colorScheme.onSurfaceVariant,
-        child: const Icon(Icons.person_outlined),
+      child: SemanticIconButton(
+        semanticsLabel: context.l10n.spectatorRoom,
+        onPressed: () {
+          final s = ref.read(tvGameCtrl).value;
+          if (s == null) return;
+          showModalBottomSheet<void>(
+            context: context,
+            builder: (_) =>
+                WatcherListBottomSheet(nbWatchers: s.nbWatchers, watcherNames: s.watcherNames),
+          );
+        },
+        icon: Badge(
+          label: Text('$nb'),
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          textColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          child: const Icon(Icons.person_outlined),
+        ),
       ),
     );
   }
