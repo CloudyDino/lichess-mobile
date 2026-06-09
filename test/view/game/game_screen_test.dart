@@ -557,6 +557,46 @@ void main() {
     });
   });
 
+  group('Game menu (3-dot)', () {
+    testWidgets('shows Request a computer analysis for finished games without analysis', (
+      WidgetTester tester,
+    ) async {
+      await loadFinishedTestGame(tester);
+      // Let the game-over popup auto-dismiss and the providers settle.
+      await tester.pumpAndSettle();
+
+      // Tap the 3-dot menu icon in the AppBar.
+      final menuFinder = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byIcon(Icons.more_horiz),
+      );
+      expect(menuFinder, findsOneWidget);
+      await tester.tap(menuFinder);
+      await tester.pumpAndSettle();
+
+      // Sanity: the menu opened (Settings is always present).
+      expect(find.text('Settings'), findsOneWidget);
+      expect(find.text('Request a computer analysis'), findsOneWidget);
+    });
+
+    testWidgets('does not show Request a computer analysis while a game is still active', (
+      WidgetTester tester,
+    ) async {
+      await createTestGame(tester);
+      await tester.pump();
+
+      final menuFinder = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byIcon(Icons.more_horiz),
+      );
+      expect(menuFinder, findsOneWidget);
+      await tester.tap(menuFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Request a computer analysis'), findsNothing);
+    });
+  });
+
   group('Plays sound for', () {
     testWidgets('move', (WidgetTester tester) async {
       final mockSoundService = MockSoundService();

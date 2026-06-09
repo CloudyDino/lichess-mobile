@@ -206,11 +206,22 @@ final isGameBookmarkedProvider = FutureProvider.autoDispose.family<bool, GameFul
   return (await ref.watch(gameControllerProvider(gameId).future)).game.bookmarked ?? false;
 }, name: 'IsGameBookmarkedProvider');
 
-/// A provider that exposes data needed for sharing the game.
+/// A provider that exposes data needed by the game's overflow (3-dot) menu.
+///
+/// Includes whether the game is finished, the player point of view, and
+/// whether the finished game already has a server-computed analysis (used
+/// to gate the "Request a computer analysis" action).
 final gameShareDataProvider = FutureProvider.autoDispose
-    .family<({bool finished, Side? pov}), GameFullId>((Ref ref, GameFullId gameId) async {
+    .family<({bool finished, Side? pov, bool hasAnalysis}), GameFullId>((
+      Ref ref,
+      GameFullId gameId,
+    ) async {
       final state = await ref.watch(gameControllerProvider(gameId).future);
-      return (finished: state.game.finished, pov: state.game.youAre);
+      return (
+        finished: state.game.finished,
+        pov: state.game.youAre,
+        hasAnalysis: state.game.playersAnalysis != null,
+      );
     }, name: 'GameShareDataProvider');
 
 /// User game preferences, defined server-side.

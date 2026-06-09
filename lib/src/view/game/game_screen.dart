@@ -2,6 +2,8 @@ import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lichess_mobile/src/model/analysis/server_analysis_service.dart';
+import 'package:lichess_mobile/src/model/auth/auth_controller.dart';
 import 'package:lichess_mobile/src/model/challenge/challenge.dart';
 import 'package:lichess_mobile/src/model/common/id.dart';
 import 'package:lichess_mobile/src/model/common/speed.dart';
@@ -310,6 +312,7 @@ class _GameMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isBookmarkedAsync = ref.watch(isGameBookmarkedProvider(gameId));
+    final shareData = ref.watch(gameShareDataProvider(gameId)).value;
 
     return ContextMenuIconButton(
       icon: const Icon(Icons.more_horiz),
@@ -335,6 +338,35 @@ class _GameMenu extends ConsumerWidget {
           onToggleBookmark: () =>
               ref.read(gameControllerProvider(gameId).notifier).toggleBookmark(),
         ),
+        // Convenience action: trigger lichess server computer analysis for a
+        // finished game from the 3-dot menu, without having to open the
+        // analysis screen first (#3296).
+        if (shareData != null && shareData.finished && !shareData.hasAnalysis)
+          ContextMenuAction(
+            icon: Icons.precision_manufacturing_outlined,
+            label: context.l10n.requestAComputerAnalysis,
+            onPressed: () async {
+              if (ref.read(authControllerProvider) == null) {
+                showSnackBar(context, context.l10n.youNeedAnAccountToDoThat);
+                return;
+              }
+              try {
+                await ref
+                    .read(serverAnalysisServiceProvider)
+                    .requestAnalysis(
+                      ServerAnalysisSource.game(gameId: gameId.gameId),
+                      shareData.pov,
+                    );
+                if (context.mounted) {
+                  showSnackBar(context, context.l10n.waitingForAnalysis);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showSnackBar(context, e.toString(), type: SnackBarType.error);
+                }
+              }
+            },
+          ),
         ...(switch (ref.watch(gameShareDataProvider(gameId))) {
           AsyncData(:final value) =>
             value.finished
