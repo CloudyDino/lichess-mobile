@@ -288,46 +288,33 @@ class _Body extends ConsumerWidget {
                 ),
               ),
               statGroupSpace,
-              Semantics(
-                container: true,
-                enabled: true,
-                button: true,
-                label: context.l10n.perfStatViewTheGames,
-                child: Tooltip(
-                  excludeFromSemantics: true,
-                  message: context.l10n.perfStatViewTheGames,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        GameHistoryScreen.buildRoute(
-                          user: user.lightUser,
-                          isOnline: true,
-                          gameFilter: GameFilterState(perfs: ISet({perf})),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '${context.l10n.perfStatTotalGames} '.localizeNumbers(),
-                            style: Styles.sectionTitle,
-                          ),
-                          Text(
-                            data.totalGames.toString().localizeNumbers(),
-                            style: _mainValueStyle,
-                          ),
-                          Text(
-                            String.fromCharCode(Icons.arrow_forward_ios.codePoint),
-                            style: Styles.sectionTitle.copyWith(fontFamily: 'MaterialIcons'),
-                          ),
-                        ],
-                      ),
-                    ),
+              // Standard "more" navigation tile: leading icon, title with
+              // total games, trailing chevron — matches the rest of the app
+              // (#3177).
+              Card(
+                margin: EdgeInsets.zero,
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  leading: const Icon(Icons.history),
+                  title: Text(context.l10n.perfStatTotalGames),
+                  subtitle: Text(context.l10n.perfStatViewTheGames),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(data.totalGames.toString().localizeNumbers(), style: _mainValueStyle),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.chevron_right),
+                    ],
                   ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      GameHistoryScreen.buildRoute(
+                        user: user.lightUser,
+                        isOnline: true,
+                        gameFilter: GameFilterState(perfs: ISet({perf})),
+                      ),
+                    );
+                  },
                 ),
               ),
               Card(
