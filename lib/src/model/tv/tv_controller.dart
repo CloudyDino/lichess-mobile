@@ -239,14 +239,19 @@ class TvController extends AsyncNotifier<TvState> {
             at: data.clock!.at,
           );
         }
+        // Only advance the cursor if the user is currently viewing the live
+        // position. If they have rewound to a previous move, keep them there.
         if (!curState.isReplaying) {
           newState = newState.copyWith(stepCursor: newState.stepCursor + 1);
+        }
 
-          if (data.san.contains('x')) {
-            _soundService.play(Sound.capture);
-          } else {
-            _soundService.play(Sound.move);
-          }
+        // Always play the move sound, even when the user is reviewing a
+        // previous position, so that incoming moves remain audible in the
+        // background (matches the broadcast experience).
+        if (data.san.contains('x')) {
+          _soundService.play(Sound.capture);
+        } else {
+          _soundService.play(Sound.move);
         }
 
         state = AsyncData(newState);
